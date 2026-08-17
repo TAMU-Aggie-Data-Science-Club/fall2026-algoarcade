@@ -1,21 +1,20 @@
 # Deliverables & Timeline
 
-> **How to read this file.** This is the PMs' best current estimate of what the project needs to ship and roughly when. It is a **living plan, not a contract** — deliverables will be added, dropped, split, or resequenced as the team learns more. The authoritative, up-to-the-minute picture always lives in the repo's **GitHub Issues and Project board**; this file is the high-level narrative that keeps everyone oriented.
->
-> PMs: replace the placeholder rows below with your real deliverables. Keep each deliverable small enough to become one or a few issues.
+> **How to read this file.** This is the PMs' best current estimate of what Arcadia needs to ship and roughly when. It is a **living plan, not a contract**. The authoritative picture lives in **GitHub Issues and the Project board**.
 
-## Milestones at a glance
+## Milestones (suggested)
 
 | # | Deliverable | Description | Owner (role) | Target |
 |---|-------------|-------------|--------------|--------|
-| 1 | Project scoping | Define the problem, success criteria, and out-of-scope items. | PM | Week 1 |
-| 2 | Data sourcing & access | Identify and secure the data sources (see [`DATA.md`](DATA.md)). | PM + members | Weeks 1–2 |
-| 3 | Data exploration (EDA) | Load, profile, and document the data; surface quality issues. | Members | Weeks 2–3 |
-| 4 | Data cleaning & prep | Reproducible pipeline from raw → analysis-ready. | Members | Weeks 3–4 |
-| 5 | Baseline model / analysis | First end-to-end result to beat. | Members | Weeks 4–5 |
-| 6 | Iteration & evaluation | Improve on the baseline; agree on evaluation metrics. | Members + PM | Weeks 5–7 |
-| 7 | Findings & deliverable | Report / dashboard / model artifact for the audience. | Members + PM | Weeks 7–8 |
-| 8 | Handoff & retro | Documentation, reproducibility check, lessons learned. | PM | Week 8 |
+| 1 | Project scoping | Pick 2–3 environments + at least 2 algorithms. Define the comparison metric (mean return, sample efficiency). Decide seed count per config. | PM | Week 1 |
+| 2 | Training framework | Config-driven training script with seed logging, TensorBoard, checkpoint saving. | Members | Weeks 1–2 |
+| 3 | CartPole sanity runs | Both algorithms solve CartPole reproducibly across seeds. Serves as the smoke test. | Members | Week 2 |
+| 4 | LunarLander runs | Multi-seed runs of each algorithm. Learning curves with confidence bands. | Members | Weeks 3–4 |
+| 5 | Atari (stretch) | One Atari game (e.g., Pong or Breakout). Budget-aware — abort if not converging within compute budget. | Members | Weeks 5–6 |
+| 6 | Cross-run comparison | Aggregation script + plots comparing algorithms across environments. Sample-efficiency + final-return summary tables. | Members | Weeks 6–7 |
+| 7 | Gameplay recordings | `RecordVideo`-wrapped rollouts for each trained agent. Compiled into short clips. | Members | Weeks 6–7 |
+| 8 | Writeup + demo | Notebook or Streamlit writeup with the comparison, clips, and takeaways. | Members + PM | Week 7 |
+| 9 | Handoff & retro | Reproducibility check (fresh clone → results within noise), lessons learned. | PM | Week 8 |
 
 ## Timeline (rough)
 
@@ -23,18 +22,19 @@
 Week:   1     2     3     4     5     6     7     8
         |-----|-----|-----|-----|-----|-----|-----|
 Scope   ██
-Data          ████
-EDA                 ████
-Prep                      ████
-Baseline                        ██
-Iterate                              ████████
-Deliver                                       ████
+Framework     ████
+CartPole            ██
+LunarLander               ████
+Atari                           ████
+Compare                             ████
+Videos                              ████
+Writeup                                    ██
 Retro                                              ██
 ```
 
 ## Working agreements
 
 - **Each deliverable maps to one or more GitHub Issues.** The board is the source of truth; this file is the summary.
-- **Dates are estimates.** When reality diverges, update the issue and, if the shift is material, this file. Don't let this file quietly go stale.
+- **Dates are estimates.** When reality diverges, update the issue and this file if the shift is material.
 - **"Done" is defined per issue** via acceptance criteria — not by a date passing.
 - **Reprioritize openly.** If a deliverable changes, a PM notes why in the issue so the decision is auditable.
