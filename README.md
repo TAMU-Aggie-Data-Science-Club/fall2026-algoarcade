@@ -53,7 +53,12 @@ See [`DELIVERABLES.md`](DELIVERABLES.md) for the suggested deliverable breakdown
 | [`DATA.md`](DATA.md) | Notes on RL "data" (environments + logs), and how to reproduce runs. |
 | [`data/`](data/) | Local working folder for training logs and checkpoints. **Git-ignored** — nothing here is committed. |
 | [`AGENTS.md`](AGENTS.md) | Machine-facing workflow rules for AI coding agents. |
+| [`CODEOWNERS`](CODEOWNERS) | **Team roster + review policy.** PMs, members, and the code-owner rule for PRs into `main`. |
 
+
+## Team
+
+The current PMs and members for this project are listed in [`CODEOWNERS`](CODEOWNERS). PMs listed there are the code owners for PRs into `main`.
 ## Notes for PMs
 
 This README, [`DELIVERABLES.md`](DELIVERABLES.md), and [`DATA.md`](DATA.md) are **suggestions**, not commitments. Rewrite them as the team scopes the real project.
