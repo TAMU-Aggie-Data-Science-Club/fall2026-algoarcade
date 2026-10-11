@@ -17,12 +17,14 @@
 7. [When to decide vs. ask](#7-when-to-decide-vs-ask)
 8. [Hard prohibitions](#8-hard-prohibitions)
 9. [Quick reference](#9-quick-reference)
+10. [AlgoArcade: commands and invariants](#10-algoarcade-commands-and-invariants)
+11. [Skills](#11-skills)
 
 ---
 
 ## 1. What this repo is
 
-This is an **IDE Data Science Club project template**. A team of PMs and members runs a data-science project out of it. The files an agent works with:
+This is **AlgoArcade**, an **Aggie Data Science Club** project: a framework for training and comparing game-playing agents, proven on Pokémon FireRed. A team of PMs and members runs it out of this repo. The files an agent works with:
 
 | File / folder | What the agent uses it for |
 |---|---|
@@ -30,6 +32,10 @@ This is an **IDE Data Science Club project template**. A team of PMs and members
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | The human workflow. Honor it — don't re-explain it back to the user. |
 | [`DELIVERABLES.md`](DELIVERABLES.md) | The living plan of what the project will ship. Update when a deliverable is added, split, or resequenced. |
 | [`DATA.md`](DATA.md) | Documentation of data sources. Update whenever a new source is adopted. |
+| [`docs/`](docs/) | [`technical-plan.md`](docs/technical-plan.md) (what and why), [`harness-spec.md`](docs/harness-spec.md) (the interface contract and logging schema), [`development-plan.md`](docs/development-plan.md) (who and when), [`decisions.md`](docs/decisions.md), [`setup.md`](docs/setup.md). Read the spec section for the area you are changing. |
+| [`src/algoarcade/`](src/algoarcade/) | The package. Each subfolder's README names its owner and contract. |
+| [`tests/`](tests/) | Unit tests and the backend conformance suite. |
+| [`tools/`](tools/) | The file guard and the work-item loader. |
 | [`data/`](data/) | Local datasets. **Git-ignored.** Never commit anything under it. |
 
 If any of these files are missing or clearly out of date for what the user is doing, say so before proceeding.
@@ -70,7 +76,7 @@ Skip the plan file only for trivial edits (fix a typo, tweak one line). When in 
 Features live on their own branches. The agent's rules for staying on the right one:
 
 - **Never work directly on `main`.** If the user asks you to edit code on `main`, stop and ask which branch to use.
-- **One task, one branch.** Work on the branch dedicated to the task's feature. If the branch doesn't exist yet, create one under the appropriate namespace and confirm the name with the user.
+- **One task, one branch.** Work on the branch dedicated to the task's issue: `issue-<n>/<slug>`, cut from an up-to-date `main`, with a pull request opened against `main`. If the branch doesn't exist yet, create it and confirm the name with the user.
 - **Match branch conventions.** Look at existing branches (`git branch -a`) and mirror the naming shape. If nothing's established, propose a scheme and get user approval before creating branches.
 - **Small commits, meaningful messages.** Each commit should be one coherent step, with a message that says *why* — not just *what*.
 - **Push your work** so the user can see it. Don't sit on uncommitted or unpushed changes for long stretches.
@@ -94,10 +100,10 @@ Features live on their own branches. The agent's rules for staying on the right 
 The `data/` folder is git-ignored and holds datasets the team pulls down locally. Rules for the agent:
 
 - **Never commit anything under `data/`.** Not raw files, not cleaned files, not sample rows, not `.parquet`/`.csv` fragments. If the user asks you to commit data, refuse and explain why — this is a hard rule from [`DATA.md`](DATA.md).
-- **Commit the pipeline, not the data.** The scripts/notebooks that fetch and process data must be reproducible and tracked in git. The outputs go to `data/raw/`, `data/interim/`, or `data/processed/` locally and stay there.
+- **Commit the pipeline, not the data.** The scripts/notebooks that fetch and process data must be reproducible and tracked in git. The outputs go under `data/` locally and stay there.
 - **Document sources in [`DATA.md`](DATA.md)**, not in code comments. If you help the user adopt a new source, update the source register in the same change.
 - **Sensitivity checks.** Before writing any pipeline that fetches data, verify the source's license and sensitivity per the checklist in [`DATA.md`](DATA.md). If anything is unclear (license, PII, permission), stop and ask a PM.
-- **Local layout.** Keep the `data/raw/` → `data/interim/` → `data/processed/` structure. Don't invent new top-level folders inside `data/` without approval.
+- **Local layout.** Keep the layout in [`DATA.md`](DATA.md) (`roms/`, `states/`, `pokefirered/`, `runs/`, `videos/`, `llm/`). Don't invent new top-level folders inside `data/` without approval.
 
 ---
 
@@ -159,3 +165,43 @@ When finishing:
 - [ ] Acceptance criteria met.
 - [ ] Pushed the branch.
 - [ ] Summarized what changed, what was left out, and any items still awaiting a user decision.
+
+---
+
+## 10. AlgoArcade: commands and invariants
+
+**Commands.** Run everything through `uv run`; never `pip install` into the environment.
+
+- `uv sync` sets up. `uv run poe check` is the gate: format, lint, types, tests. Run it before you say anything works, and paste its real output.
+- `uv run pytest tests/conformance -q` runs one folder; `uv run pytest -k <word>` runs matching tests; `uv run poe fmt` formats.
+
+**Invariants.** Each of these fails silently if broken.
+
+- Memory addresses come from the pokefirered symbol table, with the symbol name and commit recorded. Never from a wiki or from memory.
+- Save block pointers are dereferenced on every read. Never cache the address they point to.
+- A location is always `(map_group, map_num, x, y)`.
+- Every reward component is named, logged on its own, returns zero on a no-op step and on reset, and ships with an isolation test and an exploit note.
+- Gamma is an explicit config field and is never left at a library default. The baseline is 0.997.
+- A step-budget end is truncation, not termination.
+- A headline claim needs five seeds. Fewer is labeled exploratory.
+- The logging schema is frozen after October 25. Changing a logged field after that is a PM decision.
+- Nobody debugs on the training box. Debug locally with one environment and 1,000 steps.
+- ROMs, save states, symbol files, map binaries and anything under `data/` never enter git.
+
+**Write the smallest code that does the job.**
+
+- Build what the task asks for. No extra features, options, or refactors of code you were not asked to touch.
+- No comment that restates the code and no docstring that restates the signature. Comment only what the code cannot say.
+- No error handling for cases that cannot happen. Validate at boundaries (files, ROMs, user input, API responses) and trust it inside.
+- No helper for a single use and no abstraction with one implementation. The four protocols (GameBackend, GameState, StateReader, RewardComponent) are the exceptions.
+- Delete debug prints, commented-out code and scratch files before you finish.
+
+**Write plainly.** Docs, issues, commit messages and PR text follow `.claude/skills/plain-writing/SKILL.md`: lead with the fact, say it once, specifics over adjectives, claim only what you ran.
+
+**Clean up before every PR.** Run `.claude/skills/pr-cleanup/SKILL.md` on the branch: delete comments that restate the code, code that only looks careful, debug leftovers and unrelated changes, and shorten the prose in the files you changed.
+
+---
+
+## 11. Skills
+
+Skills live at `.claude/skills/<name>/SKILL.md`. Claude Code loads them on its own. In any other tool, open the file when the situation matches: `plain-writing` (any prose a person will read), `pr-cleanup` (clean a branch before every PR), `deslop` (strip bloat from code), `ram-field` (a value read from game memory), `reward-component` (a reward term), `experiment` (define, launch or report a run), `start-issue` and `open-pr` (the issue workflow).

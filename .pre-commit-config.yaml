@@ -1,0 +1,24 @@
+# Run by prek (or pre-commit). Install once with: uv run prek install
+# Every hook runs a tool from the locked dev environment, so local runs and CI agree.
+repos:
+  - repo: local
+    hooks:
+      - id: guard-files
+        name: no game data, nothing under data/, no large files
+        entry: uv run --no-sync python tools/guard_files.py
+        language: system
+      - id: ruff-check
+        name: ruff check
+        entry: uv run --no-sync ruff check --fix
+        language: system
+        types: [python]
+      - id: ruff-format
+        name: ruff format
+        entry: uv run --no-sync ruff format
+        language: system
+        types: [python]
+      - id: typos
+        name: typos
+        entry: uv run --no-sync typos
+        language: system
+        types: [text]

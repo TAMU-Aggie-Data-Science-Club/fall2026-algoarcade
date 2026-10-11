@@ -1,0 +1,20 @@
+# Code owners are requested for review on every pull request that touches their paths.
+# One approval from a listed owner satisfies the review rule on main.
+
+* @sahil-d-patel
+
+# Roster. Replace each placeholder with a GitHub handle, then uncomment the lane lines below.
+#
+#   Sahil (PM)   PM                                  @sahil-d-patel
+#   Co-PM        PM                                  TBD
+#   Member 1     Environment, Emulation Engineer     TBD
+#   Member 2     Environment, Memory Engineer        TBD
+#   Member 3     Training, RL Engineer               TBD
+#   Member 4     Training, Reward Engineer           TBD
+#   Member 5     Agent, Agent Engineer               TBD
+#
+# /src/algoarcade/backends/  /src/algoarcade/games/  /src/algoarcade/envs/     Member 1, Member 2
+# /src/algoarcade/rewards/   /src/algoarcade/training/                         Member 3, Member 4
+# /src/algoarcade/agent/                                                       Member 5, Co-PM
+# /src/algoarcade/logs/      /src/algoarcade/runqueue/                         Sahil (PM)
+# /.github/  /.claude/  /AGENTS.md  /docs/                                     Sahil (PM), Co-PM

@@ -1,0 +1,29 @@
+# Local ROMs, save states, logs, checkpoints. Never committed (see DATA.md).
+data/*
+!data/.gitkeep
+
+# Game data must not enter git from anywhere in the tree.
+*.gba
+*.gb
+*.gbc
+*.sav
+*.state
+*.ss[0-9]
+*.sym
+
+# Private agent working notes (see AGENTS.md section 3).
+.planning/
+
+# Personal agent settings. The shared ones are AGENTS.md and .claude/settings.json.
+CLAUDE.local.md
+.claude/settings.local.json
+.agents/
+
+# Python
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+wandb/
+
+.DS_Store

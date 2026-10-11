@@ -1,10 +1,10 @@
 # Contributing Guide
 
-This is the playbook for running an **IDE Data Science Club** project on GitHub. It is **not** a general Git tutorial — it assumes you can already commit and push. What it explains is *how we work together in this repo*: who does what, how work flows from an idea to `main`, and which Git commands you reach for at each step.
+This is the playbook for running an **Aggie Data Science Club** project on GitHub. It is **not** a general Git tutorial — it assumes you can already commit and push. What it explains is *how we work together in this repo*: who does what, how work flows from an idea to `main`, and which Git commands you reach for at each step.
 
 Read your role's section first. Everyone should read [The Flow](#the-flow-issue--main) and [Staying in Sync](#staying-in-sync) — they apply to all of us.
 
-> **Two roles, one repo.** **Project Managers (PMs)** are *managers*: they turn goals into issues, review pull requests, and are the only people who approve merges to `main`. **Members** are *developers*: they take an issue, build it on a branch, open a pull request, respond to review, and merge their work up the tree. If you are an AI agent working in this repo, also read [`AGENTS.md`](AGENTS.md) — it is the strict machine-facing version of this same workflow.
+> **Two roles, one repo.** **Project Managers (PMs)** are *managers*: they turn goals into issues, review pull requests, and are the only people who approve merges to `main`. **Members** are *developers*: they take an issue, build it on a branch, open a pull request against `main`, and respond to review. If you are an AI agent working in this repo, also read [`AGENTS.md`](AGENTS.md) — it is the strict machine-facing version of this same workflow.
 
 > **Companion files.** This guide links to other template files — [`AGENTS.md`](AGENTS.md), [`README.md`](README.md), [`DELIVERABLES.md`](DELIVERABLES.md), [`DATA.md`](DATA.md), and the [`data/`](data/) folder. They are part of the template and are populated as the repo is set up (each lands through its own issue and PR, exactly as described below). If a link 404s, that file simply hasn't been merged to `main` yet — it will be before the template is complete.
 
@@ -18,45 +18,45 @@ Read your role's section first. Everyone should read [The Flow](#the-flow-issue-
 4. [For Members (developers)](#for-members-developers)
 5. [For Project Managers (managers)](#for-project-managers-managers)
 6. [Branch naming](#branch-naming)
-7. [Worktrees: one issue, one tree](#worktrees-one-issue-one-tree)
+7. [Worktrees (optional)](#worktrees-optional)
 8. [Git commands in context](#git-commands-in-context)
-9. [Code-review agents (strongly recommended)](#code-review-agents-strongly-recommended)
-10. [Golden rules](#golden-rules)
+9. [Checks before you open a PR](#checks-before-you-open-a-pr)
+10. [Working with AI agents](#working-with-ai-agents)
+11. [Code-review agents (strongly recommended)](#code-review-agents-strongly-recommended)
+12. [Golden rules](#golden-rules)
 
 ---
 
 ## The mental model
 
-Every change starts as a **GitHub Issue** (the *why*) and ends as a **merge into `main`** (the *done*). In between, work lives on branches organized as a small **tree**:
+Every change starts as a **GitHub Issue** (the *why*) and ends as a **merge into `main`** (the *done*). In between, the work lives on one branch per issue, cut from `main`:
 
 ```
-main                         ← protected. Only PMs merge here.
- └── issue-42/integration    ← one "root" branch per issue (the trunk of this issue's tree)
-      ├── issue-42/loader     ← a feature branch: one cohesive piece of the issue
-      └── issue-42/charts      ← another feature branch, worked in parallel
+main                          ← protected. Changes arrive only through reviewed pull requests.
+ ├── issue-42/mgba-backend    ← one branch per work item, cut from the latest main
+ └── issue-57/reward-registry ← another work item, built in parallel
 ```
 
 - **`main`** is the source of truth. It should always be in a known-good state. Nobody pushes to it directly.
-- **An integration (root) branch** is created per issue. It collects all the work for that issue and is the **only** branch that opens a pull request into `main`.
-- **Feature branches** hang off the integration branch. Each is one small, reviewable slice. They merge *up* into the integration branch, not into `main`.
+- **A work item branch** is created per issue, from the latest `main`. It holds that issue's work and opens a pull request **straight into `main`**.
+- **Big issue?** Split it into several branches, each with its own small pull request into `main`. Small pull requests get reviewed; sprawling ones get skimmed.
 
-Work flows **up the tree**: feature → integration → `main`. Reviews happen at every step. When `main` finally receives the integration branch, the whole team is back on the same page.
+Work flows one way: issue → branch → pull request → `main`. When `main` receives the pull request, the whole team is back on the same page.
 
 ---
 
 ## The flow: issue → `main`
 
-This is the loop the whole project runs on. Every deliverable in this repo — including this file — went through it.
+This is the loop the whole project runs on.
 
-1. **Open an Issue.** Describe the problem, the goal, and a checklist of acceptance criteria. No issue, no work.
-2. **Cut the tree.** From the latest `main`, create the issue's integration branch, then a feature branch (in its own worktree) for the slice you're building.
-3. **Build the slice.** Small, focused commits. Push early so others can see progress.
-4. **Open a Pull Request** from your feature branch into the **integration branch** (not `main`).
-5. **Review.** Wait for the code-review agent (if enabled) and for a human reviewer. Address the comments.
-6. **Merge up.** Once approved, merge the feature branch into the integration branch. Repeat 2–6 for each slice.
-7. **PM reviews the integration branch → `main`.** When every slice for the issue has merged into the integration branch, a PM does the final review and merges to `main`.
-8. **Clean up.** Delete merged branches (local + remote) and remove the worktree. **History is preserved by the merge commits** — deleting the branch label does not delete the commits.
-9. **Close the Issue** (a merged PR that says `Closes #42` does this automatically).
+1. **Open an Issue.** Describe the problem, the goal, and a checklist of acceptance criteria. No issue, no work. (Ours are loaded from [`tools/github/issues/`](tools/github/issues/).)
+2. **Cut a branch** from the latest `main`, named for the issue.
+3. **Build.** Small, focused commits. Push early so others can see progress.
+4. **Open a Pull Request** from your branch into **`main`**. Put `Closes #42` in the description.
+5. **Review.** CI runs the checks. A code owner from your lane reviews. Address the comments.
+6. **Merge.** Once CI is green and the review is approved, a PM merges to `main`.
+7. **Clean up.** Delete the merged branch (local + remote). **History is preserved by the merge commit** — deleting the branch label does not delete the commits.
+8. **The Issue closes** automatically when the pull request merges.
 
 ---
 
@@ -69,7 +69,7 @@ git switch main
 git pull origin main          # fast-forward your local main to match GitHub
 ```
 
-When you cut a new branch, cut it from an **up-to-date** `main`. If your feature branch has fallen behind the integration branch while you were building, bring it forward before opening/updating your PR (see [rebase vs. merge](#git-commands-in-context)).
+When you cut a new branch, cut it from an **up-to-date** `main`. If your branch has fallen behind `main` while you were building, bring it forward before opening/updating your PR (see [rebase vs. merge](#git-commands-in-context)).
 
 If you skip this, you will build on stale code and hit avoidable merge conflicts. **When in doubt, `git fetch` and look before you leap:**
 
@@ -82,34 +82,28 @@ git status                    # are you ahead/behind? clean/dirty?
 
 ## For Members (developers)
 
-You own the *building*. Your job is to turn one issue's slice into a clean, reviewed PR.
+You own the *building*. Your job is to turn one issue into a clean, reviewed PR.
 
 **1. Pick up an issue.** Assign it to yourself on GitHub so no two people duplicate work. Read the acceptance criteria — that's your definition of done.
 
 **2. Sync, then branch off `main`.**
 ```sh
 git switch main && git pull origin main
-git switch -c issue-42/integration        # create the issue's trunk (if it doesn't exist yet)
-git push -u origin issue-42/integration
+git switch -c issue-42/mgba-backend
 ```
 
-**3. Create a worktree for your slice** (see [Worktrees](#worktrees-one-issue-one-tree)):
-```sh
-git worktree add -b issue-42/loader ../PM_REPO_TEMPLATE.worktrees/loader issue-42/integration
-```
+**3. Build in small commits.** Each commit should be one coherent step, with a message that says *why*, not just *what*.
 
-**4. Build in small commits.** Each commit should be one coherent step, with a message that says *why*, not just *what*.
-
-**5. Push and open a PR into the integration branch:**
+**4. Push and open a PR into `main`:**
 ```sh
-git push -u origin issue-42/loader
-gh pr create --base issue-42/integration --fill
+git push -u origin issue-42/mgba-backend
+gh pr create --base main --fill
 ```
 Write a description a reviewer can act on: what changed, what you deliberately left out, and how you verified it.
 
-**6. Respond to review.** Read the whole review before touching anything. Fix what's clearly right yourself; only ask the PM when there's a real judgment call (naming, scope, product behavior). Push follow-up commits and re-request review.
+**5. Respond to review.** Read the whole review before touching anything. Fix what's clearly right yourself; only ask the PM when there's a real judgment call (naming, scope, product behavior). Push follow-up commits and re-request review.
 
-**7. Merge up** once approved (feature → integration), then delete your feature branch and remove the worktree. Move to the next slice.
+**6. After the merge,** delete your branch, pull `main`, and move to the next issue.
 
 **You are also a reviewer.** When a teammate requests review, read their PR and leave comments. Reviewing is half the job of being a developer here — it's how we catch bugs before `main` and how everyone learns the codebase.
 
@@ -124,12 +118,12 @@ You own the *coordination and the gate to `main`*. You mostly work in GitHub's U
 **2. Maintain the board.** Keep issues triaged and prioritized so members always know what to pick up next. Link related issues; close duplicates.
 
 **3. Review pull requests.** This is your core review responsibility:
-   - Feature → integration PRs can be reviewed by any member or by you.
-   - **The integration → `main` PR is yours to review and merge.** Confirm every slice landed, the code-review agent passed, and the acceptance criteria are met.
+   - Every PR targets `main`. A code owner from the author's lane reviews it first.
+   - **The merge is yours.** Confirm CI is green, the review is approved, and the issue's acceptance criteria are met.
 
    Use GitHub's review tools deliberately: **Comment** to ask questions, **Request changes** to block until fixed, **Approve** to sign off. Review the *diff*, not the whole repo.
 
-**4. Gatekeep `main`.** Only you merge to `main`, and only after the integration branch is green and reviewed. Never enable auto-merge on a PR targeting `main`. Prefer **branch protection** on `main` (require a PR + at least one approval) so the rule is enforced, not just trusted.
+**4. Gatekeep `main`.** Only you merge to `main`, and only after the PR is green and reviewed. Never enable auto-merge on a PR targeting `main`. Prefer **branch protection** on `main` (require a PR + at least one approval) so the rule is enforced, not just trusted.
 
 **5. Keep the team in sync.** After a merge to `main`, remind members to `git pull origin main` before continuing — anyone behind is building on outdated code.
 
@@ -139,37 +133,33 @@ You own the *coordination and the gate to `main`*. You mostly work in GitHub's U
 
 ## Branch naming
 
-Namespace every branch by its issue number so the tree is obvious at a glance:
+Name every branch for its issue so the list is obvious at a glance:
 
 ```
-issue-<n>/integration        # the root/trunk branch for issue <n>
-issue-<n>/<slice-slug>        # a feature/slice branch off the integration branch
+issue-<n>/<slug>        # <n> is the GitHub issue number, <slug> says what the branch builds
 ```
 
 **One hard rule:** inside an `issue-<n>/` namespace, every branch name is a **flat leaf** — no branch name may be a *prefix* of another. Git stores refs as files, so a branch named `issue-1/guide` makes it **impossible** to also create `issue-1/guide/body` (you'll get `cannot lock ref ... 'issue-1/guide' exists`). Use `issue-1/guide` and `issue-1/guide-body` instead.
 
 ---
 
-## Worktrees: one issue, one tree
+## Worktrees (optional)
 
-A **worktree** lets you check out multiple branches into **separate folders at the same time**, all backed by the one repository. That's how you build a feature slice without disturbing `main` (or another slice) in your main folder.
+A **worktree** lets you check out multiple branches into **separate folders at the same time**, all backed by the one repository. Reach for one when you need to work on two issues at once, or review a teammate's branch without stashing your own work.
 
 ```sh
-# create a new branch AND a folder for it, based off the integration branch
-git worktree add -b issue-42/loader ../PM_REPO_TEMPLATE.worktrees/loader issue-42/integration
+# create a new branch AND a folder for it, based off main
+git worktree add -b issue-42/mgba-backend ../AlgoArcade.worktrees/mgba-backend main
 
-# work in that folder like a normal clone
-cd ../PM_REPO_TEMPLATE.worktrees/loader
-# ...edit, commit, push...
+# work in that folder like a normal clone (it needs its own `uv sync`)
+cd ../AlgoArcade.worktrees/mgba-backend
 
 # see all active worktrees
 git worktree list
 
 # when the branch is merged and the folder is no longer needed
-git worktree remove ../PM_REPO_TEMPLATE.worktrees/loader
+git worktree remove ../AlgoArcade.worktrees/mgba-backend
 ```
-
-Why we use them: parallel slices of one issue can each have their own folder, so switching contexts is `cd`, not `git stash` + `git switch`. The whole set of branches under `issue-42/` is that issue's **tree**, and it collapses back into `issue-42/integration` as slices merge up.
 
 ---
 
@@ -180,17 +170,47 @@ Reach for these at the moments described — not as isolated trivia.
 - **`git fetch origin`** — *"What has changed on GitHub?"* Updates your remote-tracking view without changing your files. Safe anytime; do it before deciding whether you're behind.
 - **`git pull origin main`** — *"Bring my local `main` up to date."* Fetch + merge in one step. Run before cutting a branch.
 - **`git push -u origin <branch>`** — *"Publish my branch."* The `-u` sets upstream so later `git push`/`git pull` need no arguments.
-- **`git rebase <base>`** — *"Replay my commits on top of the latest base."* Use it to bring a feature branch forward onto an updated integration branch so your PR is a clean, linear diff. **Only rebase branches that are yours and not yet merged.** Rebasing shared history rewrites commits others may have — don't.
+- **`git rebase <base>`** — *"Replay my commits on top of the latest base."* Use it to bring your branch forward onto an updated `main` so your PR is a clean, linear diff. **Only rebase branches that are yours and not yet merged.** Rebasing shared history rewrites commits others may have — don't.
   ```sh
-  git switch issue-42/loader
+  git switch issue-42/mgba-backend
   git fetch origin
-  git rebase origin/issue-42/integration
+  git rebase origin/main
   ```
-- **`git merge`** — *"Combine another branch into this one, preserving both histories."* This is how work moves **up the tree** (feature → integration → `main`). We keep merge commits so the small-commit trail stays auditable.
+- **`git merge`** — *"Combine another branch into this one, preserving both histories."* This is how a reviewed PR lands on `main`. We keep merge commits so the small-commit trail stays auditable.
 - **`git reset`** — *"Move my branch pointer / unstage things."* Use `git reset --soft HEAD~1` to undo the last *local* commit but keep the changes, or `git restore --staged <file>` to unstage. **Never `git reset --hard` on work you haven't backed up, and never rewrite commits you've already pushed to a shared branch.**
 - **`--force` / `--force-with-lease`** — avoid. Only ever force-push a branch that is exclusively yours, and prefer `--force-with-lease` so you don't clobber someone else's push. If you feel you need to force-push a shared branch, stop and ask a PM.
 
 > If a rebase or merge produces conflicts: don't panic. Open the conflicted files, resolve the `<<<<<<<`/`=======`/`>>>>>>>` markers, `git add` them, and continue (`git rebase --continue` or commit the merge). If it's a mess, `git rebase --abort` / `git merge --abort` puts you back where you started.
+
+---
+
+## Checks before you open a PR
+
+Run the project check and make it pass:
+
+```sh
+uv run poe check
+```
+
+It runs the formatter, the linter, the type checker and the tests. CI runs the same thing on Linux, Windows and macOS, and the pre-commit hook (`uv run prek install`, once) runs most of it on every commit. Setup is in [`docs/setup.md`](docs/setup.md).
+
+Then fill in the pull request template. Paste the real output under "How it was verified". If you did not run something, say so. Two questions in the template are specific to this project:
+
+- **Touches a reward component?** Say how an agent would exploit it.
+- **Touches the logging schema after October 25?** Say which runs need re-running. A PM has to agree first.
+
+---
+
+## Working with AI agents
+
+We use AI coding agents heavily. They follow the same branch, review and merge rules as people, and **you are responsible for every line an agent writes under your name.** Read the diff before you ask anyone else to.
+
+- Every tool we use reads [`AGENTS.md`](AGENTS.md). It holds the rules above in strict form, the project's invariants, and an index of skills.
+- Claude Code also loads the skills in `.claude/skills/` and two hooks: one blocks pushes to `main`, force pushes and commits of game data, the other formats and lints each Python file the agent edits.
+- `/start-issue <n> <slug>` cuts the issue's branch from an up-to-date `main` and writes its plan file. `/open-pr` checks the work against the issue's acceptance criteria and drafts the pull request.
+- Before every PR, ask the agent to run the `pr-cleanup` skill. It removes unnecessary comments, impossible-case error handling, single-use abstractions and leftover debug code, and shortens the prose in the files you changed. The point is a small diff that is quick to review. `/open-pr` runs it for you.
+- For changes to rewards, training, the environment or the logging schema, ask the `rl-reviewer` agent for a review. It looks for the mistakes that make a run finish without error and be wrong.
+- Using a tool that does not read `.claude/skills/` (Codex, Antigravity, Zed)? Open the skill file named in the index at the end of [`AGENTS.md`](AGENTS.md) and paste or reference it.
 
 ---
 
@@ -213,7 +233,7 @@ How it fits the flow: when a PR opens, the agent reviews it automatically and si
 - **Never push to `main`.** It moves only through a reviewed PR merged by a PM.
 - **Sync before you branch.** Cut from an up-to-date `main`; pull often.
 - **Small slices, small PRs.** If a PR is sprawling, split it.
-- **Merge up the tree** with merge commits — feature → integration → `main`.
+- **One issue, one branch, one PR into `main`.** Merged with a merge commit.
 - **Review each other's work.** Everyone is a reviewer.
 - **Don't rewrite shared history.** No force-push / hard-reset on branches others use.
 - **Delete merged branches, keep the commits.** Clean tree, full history.

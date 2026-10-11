@@ -1,0 +1,29 @@
+name: Bug
+description: Something behaves differently from the spec or the docs.
+labels: []
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: Paste the real output or attach a clip. For a training run, give the run id.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: The exact command, seed and start state.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, backend (fake, pyboy, mgba), git commit, ROM SHA-1 if one was loaded.

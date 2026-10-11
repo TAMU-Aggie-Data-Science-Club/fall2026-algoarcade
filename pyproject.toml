@@ -1,0 +1,78 @@
+[project]
+name = "algoarcade"
+version = "0.1.0"
+description = "A framework for training and comparing game-playing agents, proven on Pokemon FireRed."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "numpy",
+    "gymnasium",
+    "pyboy>=2.8.1,<3",
+    "pyarrow",
+    "tyro",
+    "cffi",
+]
+
+[dependency-groups]
+dev = ["ruff", "pyrefly", "pytest", "poethepoet", "prek", "typos"]
+train = ["torch", "stable-baselines3", "wandb"]
+agent = ["mcp>=2.3,<3", "anthropic"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/algoarcade"]
+
+[tool.uv]
+default-groups = ["dev", "train", "agent"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tools", "tools/github", ".claude/hooks"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W", "I", "UP", "B", "SIM", "C4", "RET", "PTH", "PT", "PERF", "NPY", "RUF",
+    "ERA", "T20", "BLE", "A", "ARG", "PGH003", "PGH004",
+    "C901", "PLR0912", "PLR0913", "PLR0915",
+]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tools/**" = ["T20"]
+".claude/hooks/**" = ["T20"]
+"scripts/**" = ["T20"]
+"tests/**" = ["ARG", "PLR2004"]
+
+[tool.pyrefly]
+project-includes = ["src", "tests", "tools"]
+search-path = ["src", "tools", "tools/github", ".claude/hooks"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["tools", "tools/github", ".claude/hooks"]
+addopts = ["--strict-markers"]
+markers = ["rom: needs a ROM file; skipped when the ROM is absent"]
+
+[tool.typos.files]
+extend-exclude = ["uv.lock"]
+
+[tool.typos.default.extend-words]
+# sav: save-file extension. GAE: generalized advantage estimation.
+sav = "sav"
+GAE = "GAE"
+
+[tool.typos.default]
+# A field name in the decompilation.
+extend-ignore-identifiers-re = ["otId"]
+
+[tool.poe.tasks]
+fmt = { cmd = "ruff format", help = "Format the code" }
+lint = { cmd = "ruff check", help = "Lint" }
+types = { cmd = "pyrefly check", help = "Type check" }
+test = { cmd = "pytest", help = "Run the tests" }
+items = { cmd = "python tools/github/bootstrap.py --check", help = "Validate the work item files" }
+check = { sequence = [{ cmd = "ruff format --check" }, "lint", "types", "test"], help = "What CI runs: format check, lint, types, tests" }

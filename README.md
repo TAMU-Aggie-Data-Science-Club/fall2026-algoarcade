@@ -1,68 +1,63 @@
-# AlgoArcade — Advanced
+# AlgoArcade
 
-*ADSC Catalyst Project · Fall 2026*
+*ADSC Catalyst Project, Fall 2026*
 
-## Overview
+AlgoArcade is a framework for training and comparing game-playing agents on real video games. We are proving it on Pokémon FireRed: reinforcement learning agents and a language model play through the same harness, from the same save states, and we measure both.
 
-AlgoArcade trains reinforcement-learning agents to play games through trial and error, compares different RL algorithms head-to-head, and visualizes how strategies improve over time. The final artifact is a set of trained agents plus learning-curve comparisons and playable recordings.
+The framework is the deliverable. Pokémon is the demo.
 
-## Objective
+**Status:** kickoff was October 11 2026. The repo holds the backend contract, a ROM-free test backend, the plan and the work items. Nothing is trained yet. Results land here on November 29.
 
-Ship a comparative study of at least two RL algorithms on 2–3 environments, with rigorous training logs, reproducible seeds, and a demo that shows the trained agents actually playing.
+## What we are building
 
-## Suggested tech stack
+- One backend interface over three emulators: mGBA for FireRed, PyBoy for Super Mario Land, and a fake backend for tests.
+- A StateReader that turns live game memory into typed state, with every address taken from the pokefirered decompilation.
+- A Gymnasium environment whose reward is built from named parts, each logged on its own.
+- PPO as the baseline, compared against PQN, RND and archive resets, five seeds per arm.
+- An MCP server that hands the same harness to a language model, evaluated across three levels of tooling.
+- A static dashboard, with an exploration heatmap over Kanto as the centerpiece.
 
-- **Environments:** Gymnasium, PettingZoo (multi-agent, if you want to go there)
-- **Algorithms:** Stable-Baselines3 (DQN, PPO, A2C)
-- **Modeling framework:** PyTorch
-- **Visualization:** TensorBoard for training curves, Matplotlib for cross-run comparisons, Pygame for playback
-- **Data sources:** Environments themselves (synthetic — no external dataset)
+We are aiming at the first gym badge. The plan says what we report if we miss.
 
-See [`DATA.md`](DATA.md) for how RL "data" works in this project.
+## Quick start
 
-## What team members will gain
+You need [uv](https://docs.astral.sh/uv/) and git.
 
-- Modern RL algorithms as used in real-world applications
-- Sequential decision-making through interactive environments
-- Rigorous experiment tracking — the difference between "we tried a thing" and "we have a defensible comparison"
+```sh
+git clone https://github.com/sahil-d-patel/AlgoArcade.git
+cd AlgoArcade
+uv sync
+uv run poe check
+```
 
-## Suggested scope (v1)
+`uv sync` installs Python 3.12 and every dependency from the lockfile. `uv run poe check` runs the formatter, linter, type checker and tests. If both pass, your setup works.
 
-Pick **2–3 environments** at different difficulty levels — e.g., CartPole (sanity check), LunarLander (moderate), and one Atari game (stretch). Compare **DQN vs. PPO**.
+ROMs are not in this repo and never will be. [`docs/setup.md`](docs/setup.md) covers where yours go, how to verify them, and the emulator install for your OS.
 
-Build:
+## Where things are
 
-1. Training scripts with clean seed management, config-driven hyperparameters, and TensorBoard logging,
-2. Reproducible training runs (multiple seeds per algorithm × environment),
-3. Cross-run comparison plots: learning curves with confidence bands, final-return distributions,
-4. Video recordings of trained agents playing,
-5. Streamlit or notebook writeup with the comparison + gameplay clips.
-
-**Out of scope for v1:** distributed training across machines, novel algorithm invention, model-based RL, complex reward shaping, multi-agent competitive setups.
-
-**Compute reality.** Atari agents may need 10M+ frames. Budget wisely — you can make solid contributions on CartPole + LunarLander alone. Atari is a stretch.
-
-See [`DELIVERABLES.md`](DELIVERABLES.md) for the suggested deliverable breakdown and rough timeline.
-
-## Repository map
-
-| File / folder | Purpose |
+| Path | What it is |
 |---|---|
-| [`CONTRIBUTING.md`](CONTRIBUTING.md) | **Start here.** How the team runs the project on GitHub — PM vs. member roles, the issue → PR → `main` flow, branching, worktrees, reviews. |
-| [`DELIVERABLES.md`](DELIVERABLES.md) | Suggested deliverables and rough timeline. A living plan, not a contract. |
-| [`DATA.md`](DATA.md) | Notes on RL "data" (environments + logs), and how to reproduce runs. |
-| [`data/`](data/) | Local working folder for training logs and checkpoints. **Git-ignored** — nothing here is committed. |
-| [`AGENTS.md`](AGENTS.md) | Machine-facing workflow rules for AI coding agents. |
-| [`CODEOWNERS`](CODEOWNERS) | **Team roster + review policy.** PMs, members, and the code-owner rule for PRs into `main`. |
+| [`docs/technical-plan.md`](docs/technical-plan.md) | What we are building and why |
+| [`docs/development-plan.md`](docs/development-plan.md) | Who does what, week by week, through November 30 |
+| [`docs/harness-spec.md`](docs/harness-spec.md) | The interfaces and the logging schema |
+| [`docs/decisions.md`](docs/decisions.md) | Design decisions and the reasons behind them |
+| [`docs/setup.md`](docs/setup.md) | Onboarding |
+| [`DELIVERABLES.md`](DELIVERABLES.md) | The milestone table |
+| [`DATA.md`](DATA.md) | Every data source, its license, and what may be committed |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | How work moves from an issue to `main`. Start here before touching code. |
+| [`AGENTS.md`](AGENTS.md) | Rules for AI coding agents working in this repo |
+| [`src/algoarcade/`](src/algoarcade/) | The package. Each subfolder has a README naming its owner and first issue. |
+| [`tests/`](tests/) | The conformance suite every backend must pass, and unit tests |
+| [`tools/github/`](tools/github/) | The work items as files, and the script that loads them into GitHub Issues |
+| [`data/`](data/) | Local ROMs, save states, logs and checkpoints. Git-ignored. Nothing here is committed. |
 
+## How we work
+
+Every change starts as a GitHub issue and reaches `main` through a reviewed pull request. [`CONTRIBUTING.md`](CONTRIBUTING.md) has the flow.
+
+We use AI coding agents heavily. The repo is set up so they follow the same rules we do: [`AGENTS.md`](AGENTS.md) is read by every tool, Claude Code picks up the skills in `.claude/skills/` (including one that cleans a branch before every pull request), and the same checks run in pre-commit and CI whoever wrote the code. The author is responsible for every line an agent writes.
 
 ## Team
 
-The current PMs and members for this project are listed in [`CODEOWNERS`](CODEOWNERS). PMs listed there are the code owners for PRs into `main`.
-## Notes for PMs
-
-This README, [`DELIVERABLES.md`](DELIVERABLES.md), and [`DATA.md`](DATA.md) are **suggestions**, not commitments. Rewrite them as the team scopes the real project.
-
-## Notes for members
-
-Read [`CONTRIBUTING.md`](CONTRIBUTING.md) before touching code. Then pick up an issue from the board.
+Two PMs and five members across three lanes: Environment, Training and Agent. Roles are in [`docs/development-plan.md`](docs/development-plan.md). Code owners are in [`CODEOWNERS`](CODEOWNERS).
